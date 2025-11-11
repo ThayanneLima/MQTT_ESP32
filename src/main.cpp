@@ -31,6 +31,14 @@ unsigned long lastMsg = 0;
 float temperatura = 0;
 float pressao = 0;
 
+unsigned long displayTime=0;
+
+int n_packet=0;
+
+//Nível de carga da bateria
+BatteryManager bm(/*pin*/1);
+SystemManager sm(bm);
+
 void setup_wifi()
 {
   delay(10);
@@ -129,6 +137,25 @@ void setup() {
 }
 
 void loop() {
+  sm.tick();
+  float pct = sm.batteryPercent();
+
+  auto mode = PowerMode::select_for(&sm, pct);
+  Serial.printf("[Power] v=%.3fV  pct=%.0f%%  -> %s\n",
+                sm.batteryVoltage(), pct,
+                BatteryManager::toString(sm.currentMode())); // opcional
+
+  mode->enter_mode();   // executa a estratégia
+  mode->run_tasks();    // se não dormir, roda tarefas do modo
+
+  delay(1000);          // ajuste conforme sua aplicação
+  
+  //---------------------------
+  unsigned long currentTime= millis();
+  if (currentTime - displayTime > 2000) {
+    Serial.println(n_packet);
+    displayTime= currentTime;
+  } 
   if (!client.connected())
   {
     reconnect();
