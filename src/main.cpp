@@ -6,6 +6,10 @@
 #include <Adafruit_BMP280.h>
 #include <ArduinoJson.h>
 
+#include "PowerMode.h"
+#include "SystemManager.h"
+#include "BatteryManager.h"
+
 // === Display OLED (Heltec V2) ===
 #define OLED_SDA 4
 #define OLED_SCL 15
